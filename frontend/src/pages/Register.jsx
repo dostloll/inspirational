@@ -1,18 +1,44 @@
-import React, { useState } from "react";
-
+import React, { useEffect, useState } from "react";
+import Axios from "axios";
+import { useNavigate } from "react-router-dom";
 const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [data, setData] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const getData = async () => {
+    const response = await Axios.get("http://localhost:3000/register");
+    setData(response.data);
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Add your registration logic here
     if (password !== confirmPassword) {
       alert("Passwords do not match");
       return;
+    } else if (password.length < 8) {
+      alert("Password is too short. Length Should be 8.");
+      return;
     }
-    alert(`Email: ${email}\nPassword: ${password}`);
+
+    try {
+      const response = await Axios.post("http://localhost:3000/register", {
+        email,
+        password,
+      });
+      if (response.data.success) {
+        navigate("/inspiration");
+      }
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (
@@ -21,7 +47,7 @@ const Register = () => {
         <h2 className="text-4xl text-gray-700 font-bold mb-6 text-center">
           Register
         </h2>
-        <form className="text-gray-700" onSubmit={handleSubmit}>
+        <form className="text-gray-700" action="POST" onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700 mb-2" htmlFor="email">
               Email
@@ -35,6 +61,7 @@ const Register = () => {
               required
             />
           </div>
+
           <div className="mb-4">
             <label className="block text-gray-700 mb-2" htmlFor="password">
               Password
