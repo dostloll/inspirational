@@ -35,6 +35,7 @@ const Register = () => {
       });
       if (response.data.success) {
         navigate("/inspiration");
+        alert("Registration successful.");
       }
     } catch (e) {
       console.log(e);
